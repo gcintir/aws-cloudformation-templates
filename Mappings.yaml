@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "EC2 Instance Definition"
+
+Mappings:
+  RegionAmiIdMap:
+    us-east-1:
+      AMI: ami-0b0dcb5067f052a63
+    eu-central-1:
+      AMI: ami-076309742d466ad69
+
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !FindInMap ['RegionAmiIdMap', !Ref AWS::Region, 'AMI']
+      InstanceType:  t2.micro
+      Tags:
+        - Key: Environment
+          Value: dev
+        - Key: TaskID
+          Value: '1234'
+        - Key: Name
+          Value: !Join [ " ", [ "Test", "Instance" ] ]
+        - Key: Region
+          Value: !Ref AWS::Region

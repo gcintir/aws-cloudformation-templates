@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "EC2 Instance Definition"
+
+Parameters:
+  EC2InstanceTypeParam:
+    Type: String
+    Default: 't2.micro'
+    AllowedValues:
+      - 't2.micro'
+      - 't1.micro'
+    Description: 'EC2 Instance types in Free-tier usage'
+  EC2InstanceNameParam:
+    Type: String
+    Default: 'Test Instance'
+    Description: 'Specifies EC2 Instance name'
+
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0b0dcb5067f052a63
+      InstanceType:  !Ref EC2InstanceTypeParam
+      Tags:
+        - Key: Environment
+          Value: dev
+        - Key: TaskID
+          Value: '1234'
+        - Key: Name
+          Value: !Ref EC2InstanceNameParam
