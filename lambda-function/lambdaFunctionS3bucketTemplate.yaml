@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Cloudformation template for storing lambda functions
+
+Parameters: 
+  lambdaFunctionS3BucketName:
+    Type: String
+    Default: 'lambda-functions-storage-s3-bucket'
+    Description: 'Lambda functions S3 bucket name'
+
+Resources:
+  lambdaFunctionS3Bucket:
+    Type: AWS::S3::Bucket
+    Description: 'S3 Bucket to store zipped lambda functions'
+    Properties: 
+      AccessControl: Private
+      BucketName: !Ref lambdaFunctionS3BucketName

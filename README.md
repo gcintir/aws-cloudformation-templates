@@ -102,3 +102,18 @@ View: after creating, you can view proposed changes.
 Execute: executing a change set updates the changes on existing stack
 
 Delete: you can delete a change set without performing the changes
+
+
+# Lambda function creation
+
+Go to lambda-function folder
+
+### * Create S3 Bucket to store lambda function source codes in zip format
+aws cloudformation create-stack --stack-name lambda-functions-storage-s3-bucket-cf-stack --template-body file://lambdaFunctionS3bucketTemplate.yaml
+
+### * Create lambda function
+aws cloudformation create-stack --stack-name lambda-function-cf-stack --template-body file://lambdaFunctionTemplate.yaml --capabilities CAPABILITY_NAMED_IAM
+
+### * Invoke lambda function
+aws lambda invoke --function-name hello-world-lambda-function function-result.json
+

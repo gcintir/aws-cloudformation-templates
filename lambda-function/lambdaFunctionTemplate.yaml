@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Cloudformation template for lambda function
+
+Parameters:
+  lambdaFunctionName:
+    Type: String
+    Default: 'hello-world-lambda-function'
+    Description: 'Lambda function name'
+  lambdaFunctionRuntime:
+    Type: String
+    Default: 'nodejs18.x'
+    Description: 'Lambda function runtime'
+  lambdaFunctionMemory:
+    Type: String
+    Default: '128'
+    Description: 'Lambda function memory configuration in MB'
+  lambdaFunctionTimeout:
+    Type: String
+    Default: '10'
+    Description: 'Lambda function timeout in seconds'
+  lambdaFunctionS3BucketName:
+    Type: String
+    Default: 'lambda-functions-storage-s3-bucket'
+    Description: 'Lambda function storage s3 bucket name'
+  lambdaFunctionS3BucketKey:
+    Type: String
+    Default: 'helloworld-lambda.zip'
+    Description: 'Lambda function storage s3 bucket key'
+  
+
+Resources:
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Architectures:
+        - x86_64
+      Description: 'Lambda function resource'
+      PackageType: 'Zip'
+      FunctionName: !Ref lambdaFunctionName
+      Handler: index.handler
+      Runtime: !Ref lambdaFunctionRuntime
+      MemorySize: !Ref lambdaFunctionMemory
+      Timeout: !Ref lambdaFunctionTimeout
+      Role: !GetAtt LambdaFunctionRole.Arn
+      Environment:
+        Variables:
+          env: dev
+      Code:
+        S3Bucket: !Ref lambdaFunctionS3BucketName
+        S3Key: !Ref lambdaFunctionS3BucketKey
+
+  LambdaFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${lambdaFunctionName}'  
+  
+  LambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${lambdaFunctionName}-execution-role'
+      Description: 'Lambda function execution iam role'
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: 'Allow'
+          Principal:
+            Service:
+            - 'lambda.amazonaws.com'
+          Action: 'sts:AssumeRole'
+      Path: '/'
+      Policies:
+      - PolicyName: !Sub '${lambdaFunctionName}-execution-policy'
+        PolicyDocument:
+           Version: "2012-10-17"
+           Statement:
+           - Effect: "Allow"
+             Action:
+             - 'logs:CreateLogStream'
+             - 'logs:CreateLogGroup'
+             - 'logs:PutLogEvents'
+             Resource:
+             - !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${lambdaFunctionName}*:*'
